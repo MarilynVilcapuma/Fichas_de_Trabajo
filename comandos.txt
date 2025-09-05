@@ -23,8 +23,7 @@ PARA EJECUTAR EL FROENTEND
 docker ps
 # revisar contenedores activos e inactivos
 docker ps -a
-# EJECUTAR docker
-
+EJECUTAR docker
 docker start oracle-docker
 cd backend 
 

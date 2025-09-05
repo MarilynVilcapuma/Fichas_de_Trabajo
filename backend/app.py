@@ -10,26 +10,32 @@ app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 # Configurar CORS para permitir solicitudes desde React (puerto 3000)
 #CORS(app, resources={r"/*": {"origins": "https://silver-guide-449w56p7667fq64p-3000.app.github.dev"}})
-CORS(app, resources={r"/*": {"origins": "*"}})  # Permitir todos los orígenes temporalmente
+# Configurar CORS para permitir solo React con Vite (puerto 5173)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 #CONFIGURAR EL QSlALCHEMY CON ORACLE CLOUD
 db = SQLAlchemy(app)
 
 #DEFINIR EL MODELO DE LA BASE DE DATOS
-class Fichas (db.Model):
+
+class Fichas(db.Model):
     __tablename__ = 'FICHAS'
+
     id = db.Column(db.Integer, primary_key=True)
-    tipo = db.Column(db.String(10))
-    # Campos para libro
-    nombre_autor = db.Column(db.String(100))
-    apellido_autor = db.Column(db.String(100))
-    pagina = db.Column(db.Integer)
-    
-    # Campos para video
-    nombre = db.Column(db.String(100))
-    tema = db.Column(db.String(100))
-    anio = db.Column(db.Integer)
-    link = db.Column(db.String(200))
+    tipo = db.Column(db.String(200), nullable=False)
+
+    # Campos para tipo libro
+    nombre_autor = db.Column(db.String(200), nullable=True)
+    apellido_autor = db.Column(db.String(200), nullable=True)
+    pagina = db.Column(db.Integer, nullable=True)
+
+    # Campos para tipo video
+    nombre = db.Column(db.String(200), nullable=True)
+    tema = db.Column(db.String(200), nullable=True)
+    link = db.Column(db.String(200), nullable=True)
+
+    # Común a ambos
+    anio = db.Column(db.Integer, nullable=False)
 
     def to_dict(self):
         return {
@@ -43,14 +49,10 @@ class Fichas (db.Model):
             "anio": self.anio,
             "link": self.link
         }
-#crear  las tablas en la base de datos
-with app.app_context():
-    db.create_all()
-
 
 # RUTA PARA OBTENER TODOS LOS PRODUCTOS
 # 🔄 Crear ficha
-@app.route('/fichas', methods=['POST'])
+@app.route('/FICHAS', methods=['POST'])
 def crear_ficha():
     data = request.get_json()
     tipo = data.get('tipo')
@@ -73,14 +75,14 @@ def crear_ficha():
 
 
 # 📋 Listar todas las fichas
-@app.route('/fichas', methods=['GET'])
+@app.route('/FICHAS', methods=['GET'])
 def listar_fichas():
     todas = Fichas.query.all()
     return jsonify([f.to_dict() for f in todas]), 200
 
 
 # 📝 Modificar ficha por ID
-@app.route('/fichas/<int:id>', methods=['PUT'])
+@app.route('/FICHAS/<int:id>', methods=['PUT'])
 def modificar_ficha(id):
     data = request.get_json()
     ficha = Fichas.query.get(id)
@@ -95,7 +97,7 @@ def modificar_ficha(id):
     return jsonify({'mensaje': 'Ficha actualizada', 'ficha': ficha.to_dict()}), 200
 
 # 🗑️ Eliminar ficha por ID
-@app.route('/fichas/<int:id>', methods=['DELETE'])
+@app.route('/FICHAS/<int:id>', methods=['DELETE'])
 def eliminar_ficha(id):
     ficha = Fichas.query.get(id)
     if not ficha:

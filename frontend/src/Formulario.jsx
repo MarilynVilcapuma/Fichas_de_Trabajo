@@ -1,9 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 function Formulario({ tipo, setActualizar }) {
-  const [formulario, setFormulario] = useState({});
+  const getInitialState = () => {
+    if (tipo === "libro") {
+      return { nombre_autor: "", apellido_autor: "", anio: "", pagina: "" };
+    } else {
+      return { nombre: "", tema: "", anio: "", link: "" };
+    }
+  };
+
+  const [formulario, setFormulario] = useState(getInitialState());
   const [mensaje, setMensaje] = useState("");
+  const url = "http://localhost:5000/api/fichas";
+  useEffect(() => {
+    setFormulario(getInitialState());
+    setMensaje("");
+  }, [tipo]);
 
   const handleChange = (e) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
@@ -41,22 +54,33 @@ function Formulario({ tipo, setActualizar }) {
       return;
     }
 
-    try {
-      await axios.post("http://localhost:5000/fichas", {
-        tipo,
-        ...formulario,
-      }, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-
-      setMensaje("✅ Ficha guardada con éxito.");
-      limpiarFormulario();
-      setActualizar(prev => !prev); // Notifica al padre que debe actualizar la lista
-    } catch (error) {
-      setMensaje("❌ Error al guardar la ficha.");
+    // ...código existente...
+try {
+  const response = await axios.post(url, {
+    tipo,
+    ...formulario,
+  }, {
+    headers: {
+      "Content-Type": "application/json"
     }
+  });
+
+  setMensaje("✅ Ficha guardada con éxito.");
+  limpiarFormulario();
+  setActualizar(prev => !prev); // Notifica al padre que debe actualizar la lista
+} catch (error) {
+  if (error.response) {
+    // El servidor respondió con un código fuera del rango 2xx
+    setMensaje(`Error: ${error.response.data?.mensaje || "No se pudo guardar la ficha."}`);
+  } else if (error.request) {
+    // La petición fue hecha pero no hubo respuesta
+    setMensaje("Error: No hay respuesta del servidor.");
+  } else {
+    // Algo pasó al configurar la petición
+    setMensaje(`Error: ${error.message}`);
+  }
+}
+
   };
 
   return (
