@@ -5,7 +5,7 @@ function ListaFichas({ tipo, actualizar }) {
   const [fichas, setFichas] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [busqueda, setBusqueda] = useState("");
-  var url = "/FICHAS";
+  var url = "https://curly-doodle-g4x999wrrrpp29v4r-5000.app.github.dev/FICHAS";
   useEffect(() => {
     cargarFichas();
   }, [actualizar, tipo]);

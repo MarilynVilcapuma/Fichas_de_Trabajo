@@ -12,7 +12,7 @@ function Formulario({ tipo, setActualizar }) {
 
   const [formulario, setFormulario] = useState(getInitialState());
   const [mensaje, setMensaje] = useState("");
-  const url = "http://localhost:5000/api/fichas";
+  const url = "https://curly-doodle-g4x999wrrrpp29v4r-5000.app.github.dev/FICHAS";
   useEffect(() => {
     setFormulario(getInitialState());
     setMensaje("");
